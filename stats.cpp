@@ -8,17 +8,13 @@ stats::stats(PNG & im){
         vector<long> sR, sB, sG, sqR, sqB, sqG;
         for(unsigned y = 0; y < im.height(); y++){        
             long sumr = 0, sumb = 0, sumg = 0, sumsr = 0, sumsb = 0, sumsg = 0;  
-            for(unsigned i = 0; i <= x; i++) {
-                for(unsigned j = 0; j <= y; j++) {        
-                    RGBAPixel *pix = im.getPixel(i,j);
-                    sumr += pix->r;
-                    sumb += pix->b;
-                    sumg += pix->g;
-                    sumsr += pow(pix->r,2);
-                    sumsb += pow(pix->b,2);
-                    sumsg += pow(pix->g,2);
-                }
-            }
+            RGBAPixel *pix = im.getPixel(x,y);
+            sumr += pix->r;
+            sumb += pix->b;
+            sumg += pix->g;
+            sumsr += pow(pix->r,2);
+            sumsb += pow(pix->b,2);
+            sumsg += pow(pix->g,2);
             sR.push_back(sumr);
             sB.push_back(sumb);
             sG.push_back(sumg);
@@ -40,22 +36,22 @@ long stats::getSum(char channel, pair<int,int> ul, int w, int h){
     long sum = 0;
     switch(channel){
         case 'r':
-            for(int x = ul.first; x < w; x++){
-                for(int y = ul.second; y < h; y++){
+            for(int x = ul.first; x < w + ul.first; x++){
+                for(int y = ul.second; y < h + ul.second; y++){
                     sum += sumRed[x][y];
-                } 
+                }
             }
             break;
         case 'b':
-            for(int x = ul.first; x < w; x++){
-                for(int y = ul.second; y < h; y++){
+            for(int x = ul.first; x < w + ul.first; x++){
+                for(int y = ul.second; y < h + ul.second; y++){
                     sum += sumBlue[x][y];
                 }
             }
             break;
         case 'g':
-            for(int x = ul.first; x < w; x++){
-                for(int y = ul.second; y < h; y++){
+            for(int x = ul.first; x < w + ul.first; x++){
+                for(int y = ul.second; y < h + ul.second; y++){
                     sum += sumGreen[x][y];
                 }
             }
@@ -69,22 +65,22 @@ long stats::getSumSq(char channel, pair<int,int> ul, int w, int h){
     long sum = 0;
     switch(channel){
         case 'r':
-            for(int x = ul.first; x < w; x++){
-                for(int y = ul.second; y < h; y++){
+            for(int x = ul.first; x < w + ul.first; x++){
+                for(int y = ul.second; y < h + ul.second; y++){
                     sum += sumsqRed[x][y];
                 }
             }
             break;
         case 'b':
-            for(int x = ul.first; x < w; x++){
-                for(int y = ul.second; y < h; y++){
+            for(int x = ul.first; x < w + ul.first; x++){
+                for(int y = ul.second; y < h + ul.second; y++){
                     sum += sumsqBlue[x][y];
                 }
             }
             break;
         case 'g':
-            for(int x = ul.first; x < w; x++){
-                for(int y = ul.second; y < h; y++){
+            for(int x = ul.first; x < w + ul.first; x++){
+                for(int y = ul.second; y < h + ul.second; y++){
                     sum += sumsqGreen[x][y];
                 }
             }
@@ -98,15 +94,15 @@ long stats::getSumSq(char channel, pair<int,int> ul, int w, int h){
 // see written specification for a description of this function.
 double stats::getVar(pair<int,int> ul, int w, int h){
     RGBAPixel mean = getAvg(ul,w,h);
-    double redVar = getSumSq('r', ul, w, h) - pow(mean.r,2);
-    double greenVar = getSumSq('g', ul, w, h) - pow(mean.g,2);
-    double blueVar = getSumSq('b', ul, w, h) - pow(mean.b,2);
+    double redVar = getSumSq('r', ul, w, h) - pow(getSum('r',ul,w,h),2)/(w*h);
+    double greenVar = getSumSq('g', ul, w, h) - pow(getSum('g',ul,w,h),2)/(w*h);
+    double blueVar = getSumSq('b', ul, w, h) - pow(getSum('b',ul,w,h),2)/(w*h);
 
     return (redVar+greenVar+blueVar);
     
 }
 		
 RGBAPixel stats::getAvg(pair<int,int> ul, int w, int h){
-    RGBAPixel *pix = new RGBAPixel(sumRed[w-1][h-1]/(w*h),sumGreen[w-1][h-1]/(w*h),sumBlue[w-1][h-1]/(w*h));
+    RGBAPixel *pix = new RGBAPixel(getSum('r',ul,w,h)/(w*h),getSum('g',ul,w,h)/(w*h),getSum('b',ul,w,h)/(w*h));
     return *pix;
 }
