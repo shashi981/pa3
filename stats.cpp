@@ -3,85 +3,109 @@
 
 #include "stats.h"
 
-stats::stats(PNG & im){
-    for(unsigned x = 0; x < im.width(); x++){
-        vector<long> sR, sB, sG, sqR, sqB, sqG;
-        for(unsigned y = 0; y < im.height(); y++){        
-            long sumr = 0, sumb = 0, sumg = 0, sumsr = 0, sumsb = 0, sumsg = 0;  
-            RGBAPixel *pix = im.getPixel(x,y);
-            sumr += pix->r;
-            sumb += pix->b;
-            sumg += pix->g;
-            sumsr += pow(pix->r,2);
-            sumsb += pow(pix->b,2);
-            sumsg += pow(pix->g,2);
-            sR.push_back(sumr);
-            sB.push_back(sumb);
-            sG.push_back(sumg);
-            sqR.push_back(sumsr);
-            sqB.push_back(sumsb);
-            sqG.push_back(sumsg);
+stats::stats(PNG & im)
+{
+    for(unsigned i = 0; i < im.width(); i++)
+    {
+        vector<long> statR, statB, statG, sqrR, sqrB, sqrG;
+        for(unsigned j = 0; j < im.height(); j++)
+        {        
+            long sum_statr = 0, 
+            sum_statb = 0, 
+            sum_statg = 0, 
+            sum_sqr = 0, 
+            sum_sqb = 0, 
+            sum_sqg = 0;  
+            RGBAPixel *pix = im.getPixel(i,j);
+            sum_statr += pix->r;
+            sum_statb += pix->b;
+            sum_statg += pix->g;
+            sum_statr += pow(pix->r,2);
+            sum_sqb += pow(pix->b,2);
+            sum_sqg += pow(pix->g,2);
+            statR.push_back(sum_statr);
+            statB.push_back(sum_statb);
+            statG.push_back(sum_statg);
+            sqrR.push_back(sum_sqr);
+            sqrB.push_back(sum_sqb);
+            sqrG.push_back(sum_sqg);
         }
-        sumRed.push_back(sR);
-        sumBlue.push_back(sB);
-        sumGreen.push_back(sG);
-        sumsqRed.push_back(sqR);
-        sumsqBlue.push_back(sqB);
-        sumsqGreen.push_back(sqG);
+        sumRed.push_back(statR);
+        sumBlue.push_back(statB);
+        sumGreen.push_back(statG);
+        sumsqRed.push_back(sqrR);
+        sumsqBlue.push_back(sqrB);
+        sumsqGreen.push_back(sqrG);
     }
 }
 
 
-long stats::getSum(char channel, pair<int,int> ul, int w, int h){
+long stats::getSum(char channel, pair<int,int> ul, int w, int h)
+{
     long sum = 0;
-    switch(channel){
-        case 'r':
-            for(int x = ul.first; x < w + ul.first; x++){
-                for(int y = ul.second; y < h + ul.second; y++){
-                    sum += sumRed[x][y];
-                }
-            }
-            break;
+    switch(channel)
+    {
         case 'b':
-            for(int x = ul.first; x < w + ul.first; x++){
-                for(int y = ul.second; y < h + ul.second; y++){
-                    sum += sumBlue[x][y];
+            for(int i = ul.first; i < w + ul.first; i++)
+            {
+                for(int j = ul.second; j < h + ul.second; j++)
+                {
+                    sum += sumBlue[i][j];
                 }
             }
             break;
         case 'g':
-            for(int x = ul.first; x < w + ul.first; x++){
-                for(int y = ul.second; y < h + ul.second; y++){
-                    sum += sumGreen[x][y];
+            for(int i = ul.first; i < w + ul.first; i++)
+            {
+                for(int j = ul.second; j < h + ul.second; j++)
+                {
+                    sum += sumGreen[i][j];
                 }
             }
             break;
+        case 'r':
+            for(int i = ul.first; i < w + ul.first; i++)
+            {
+                for(int j = ul.second; j < h + ul.second; j++)
+                {
+                    sum += sumRed[i][j];
+                }
+            }
+            break;    
         default: break;
     }
     return sum;
 }
 
-long stats::getSumSq(char channel, pair<int,int> ul, int w, int h){
+long stats::getSumSq(char channel, pair<int,int> ul, int w, int h)
+{
     long sum = 0;
-    switch(channel){
-        case 'r':
-            for(int x = ul.first; x < w + ul.first; x++){
-                for(int y = ul.second; y < h + ul.second; y++){
-                    sum += sumsqRed[x][y];
-                }
-            }
-            break;
+    switch(channel)
+    {
         case 'b':
-            for(int x = ul.first; x < w + ul.first; x++){
-                for(int y = ul.second; y < h + ul.second; y++){
-                    sum += sumsqBlue[x][y];
+            for(int i = ul.first; i < w + ul.first; i++)
+            {
+                for(int j = ul.second; j < h + ul.second; j++)
+                {
+                    sum += sumsqBlue[i][j];
                 }
             }
             break;
         case 'g':
-            for(int x = ul.first; x < w + ul.first; x++){
-                for(int y = ul.second; y < h + ul.second; y++){
-                    sum += sumsqGreen[x][y];
+            for(int i = ul.first; i < w + ul.first; i++)
+            {
+                for(int j = ul.second; j < h + ul.second; j++)
+                {
+                    sum += sumsqGreen[i][j];
+                }
+            }
+            break;
+        case 'r':
+            for(int i = ul.first; i < w + ul.first; i++)
+            {
+                for(int j = ul.second; j < h + ul.second; j++)
+                {
+                    sum += sumsqRed[i][j];
                 }
             }
             break;
@@ -92,17 +116,18 @@ long stats::getSumSq(char channel, pair<int,int> ul, int w, int h){
 
 // given a rectangle, compute its sum of squared deviations from mean, over all color channels.
 // see written specification for a description of this function.
-double stats::getVar(pair<int,int> ul, int w, int h){
+double stats::getVar(pair<int,int> ul, int w, int h)
+{
     RGBAPixel mean = getAvg(ul,w,h);
-    double redVar = getSumSq('r', ul, w, h) - pow(getSum('r',ul,w,h),2)/(w*h);
-    double greenVar = getSumSq('g', ul, w, h) - pow(getSum('g',ul,w,h),2)/(w*h);
-    double blueVar = getSumSq('b', ul, w, h) - pow(getSum('b',ul,w,h),2)/(w*h);
+    double r = getSumSq('r', ul, w, h)-pow(getSum('r',ul,w,h),2)/(w*h);
+    double g = getSumSq('g', ul, w, h)-pow(getSum('g',ul,w,h),2)/(w*h);
+    double b = getSumSq('b', ul, w, h)-pow(getSum('b',ul,w,h),2)/(w*h);
 
-    return (redVar+greenVar+blueVar);
-    
+    return (r+g+b);
 }
 		
-RGBAPixel stats::getAvg(pair<int,int> ul, int w, int h){
-    RGBAPixel *pix = new RGBAPixel(getSum('r',ul,w,h)/(w*h),getSum('g',ul,w,h)/(w*h),getSum('b',ul,w,h)/(w*h));
-    return *pix;
+RGBAPixel stats::getAvg(pair<int,int> ul, int w, int h)
+{
+    RGBAPixel *pixel = new RGBAPixel(getSum('r',ul,w,h)/(w*h),getSum('g',ul,w,h)/(w*h),getSum('b',ul,w,h)/(w*h));
+    return *pixel;
 }
